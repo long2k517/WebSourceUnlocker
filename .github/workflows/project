@@ -1,0 +1,59 @@
+name: WebSourceUnlocker
+options:
+  bundleIdPrefix: com.nguyenlong
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGN_IDENTITY: ""
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  WebSourceUnlocker:
+    type: application
+    platform: iOS
+    sources:
+      - path: WebSourceUnlocker
+    info:
+      path: WebSourceUnlocker/Info.plist
+      properties:
+        CFBundleDevelopmentRegion: vi
+        CFBundleDisplayName: Mở khóa mã nguồn
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nguyenlong.websourceunlocker
+        PRODUCT_NAME: WebSourceUnlocker
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: NO
+
+schemes:
+  WebSourceUnlocker:
+    build:
+      targets:
+        WebSourceUnlocker: all
+    run:
+      config: Debug
+    archive:
+      config: Release
