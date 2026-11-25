@@ -1,0 +1,64 @@
+name: build-ios-ipa
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  scan-and-build:
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      - name: Quét môi trường
+        run: |
+          set -euo pipefail
+          [[ "${{ runner.os }}" == "macOS" ]] || { echo "DỪNG: KHÔNG PHẢI MACOS"; exit 1; }
+          command -v xcodebuild >/dev/null || { echo "DỪNG: THIẾU XCODE"; exit 1; }
+          arch=$(uname -m)
+          [[ "$arch" == "arm64" || "$arch" == "x86_64" ]] || { echo "DỪNG: KIẾN TRÚC SAI"; exit 1; }
+          echo "MÔI TRƯỜNG HỢP LỆ"
+
+      - uses: actions/checkout@v4
+
+      - name: Cài XcodeGen
+        run: brew install xcodegen
+
+      - name: Tạo project
+        run: xcodegen generate
+
+      - name: Xác nhận SDK iOS
+        run: |
+          set -euo pipefail
+          sdk=$(xcrun --sdk iphoneos --show-sdk-path)
+          [[ -n "$sdk" ]] || { echo "DỪNG: THIẾU SDK IOS"; exit 1; }
+          echo "SDK=$sdk"
+
+      - name: Build unsigned
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project WebSourceUnlocker.xcodeproj \
+            -scheme WebSourceUnlocker \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Đóng gói IPA
+        run: |
+          set -euo pipefail
+          rm -rf Payload WebSourceUnlocker.ipa
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/WebSourceUnlocker.app Payload/
+          zip -r WebSourceUnlocker.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WebSourceUnlocker-ipa
+          path: WebSourceUnlocker.ipa
+          if-no-files-found: error
